@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Smartphone, MessageSquare, Volume2, Settings, Zap } from 'lucide-react';
+import GpsTracker from './GpsTracker';
+import LocationMap from './LocationMap';
 
 interface SmsMessage {
   id: string;
@@ -15,12 +17,20 @@ interface SmsMessage {
   triggered: boolean;
 }
 
+interface LocationData {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: Date;
+}
+
 const PhoneFinderApp = () => {
   const [keyword, setKeyword] = useState('ACHARCELULAR123');
   const [isAlarmActive, setIsAlarmActive] = useState(false);
   const [smsMessages, setSmsMessages] = useState<SmsMessage[]>([]);
   const [testSender, setTestSender] = useState('');
   const [testMessage, setTestMessage] = useState('');
+  const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null);
   const { toast } = useToast();
 
   // Simula o recebimento de SMS
@@ -90,6 +100,15 @@ const PhoneFinderApp = () => {
     });
   };
 
+  const handleLocationFound = (location: LocationData) => {
+    setCurrentLocation(location);
+    toast({
+      title: "📍 GPS Atualizado!",
+      description: `Nova localização obtida com precisão de ${Math.round(location.accuracy)}m`,
+      variant: "default",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -133,7 +152,7 @@ const PhoneFinderApp = () => {
           </CardHeader>
         </Card>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
           {/* Configurações */}
           <Card>
             <CardHeader>
@@ -158,7 +177,7 @@ const PhoneFinderApp = () => {
               <div className="p-3 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
                   💡 <strong>Como usar:</strong> Envie um SMS com a palavra-chave "{keyword}" 
-                  para este celular e ele irá tocar automaticamente.
+                  para este celular e ele irá tocar automaticamente e ativar o GPS.
                 </p>
               </div>
             </CardContent>
@@ -193,7 +212,18 @@ const PhoneFinderApp = () => {
               </Button>
             </CardContent>
           </Card>
+
+          {/* GPS Tracker */}
+          <GpsTracker 
+            onLocationFound={handleLocationFound}
+            isAlarmActive={isAlarmActive}
+          />
         </div>
+
+        {/* Mapa de Localização */}
+        {currentLocation && (
+          <LocationMap location={currentLocation} />
+        )}
 
         {/* Histórico de SMS */}
         <Card>
