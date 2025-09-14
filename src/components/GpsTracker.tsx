@@ -110,8 +110,29 @@ Horário: ${location.timestamp.toLocaleString('pt-BR')}`;
 
   const openInMaps = () => {
     if (!location) return;
+    
     const url = `https://maps.google.com/?q=${location.latitude},${location.longitude}`;
-    window.open(url, '_blank');
+    
+    // Tenta abrir diretamente
+    const newWindow = window.open(url, '_blank');
+    
+    // Se bloqueado pelo navegador, oferece alternativa
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Copia o link para o clipboard como fallback
+      navigator.clipboard.writeText(url).then(() => {
+        toast({
+          title: "🚫 Pop-up Bloqueado",
+          description: "Link do Google Maps copiado! Cole no navegador para abrir.",
+          variant: "default",
+        });
+      });
+    } else {
+      toast({
+        title: "🗺️ Abrindo Google Maps",
+        description: "Nova aba aberta com sua localização",
+        variant: "default",
+      });
+    }
   };
 
   // Ativar GPS automaticamente quando o alarme for ativo
