@@ -215,12 +215,25 @@ Horário: ${location.timestamp.toLocaleString('pt-BR')}`;
             </div>
 
             <Button 
-              onClick={openInMaps} 
+              asChild
               variant="outline" 
               className="w-full"
             >
-              <MapPin className="h-4 w-4 mr-2" />
-              Abrir no Google Maps
+              <a
+                href={`https://maps.google.com/?q=${location.latitude},${location.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  toast({
+                    title: "🗺️ Abrindo Google Maps",
+                    description: "Abrindo sua localização em uma nova aba",
+                    variant: "default",
+                  });
+                }}
+              >
+                <MapPin className="h-4 w-4 mr-2" />
+                Abrir no Google Maps
+              </a>
             </Button>
           </div>
         )}
